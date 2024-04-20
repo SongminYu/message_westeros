@@ -26,7 +26,7 @@ class Reporter:
         self.mp.close_db()
 
     def test(self):
-        print(self.scenario.var("EMISS", {"node": "Westeros"}))
+        print(self.scenario.var("PRICE_EMISSION", {"node": "Westeros"}))
 
     def test_save_data(self):
         DATA_NAMES = [

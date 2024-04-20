@@ -1,6 +1,18 @@
-from message.scenario import Scenario
-from message.reporter import Reporter
+import os
+
 from message.config import Config
+from message.reporter import Reporter
+from message.scenario import Scenario
+
+
+"""
+run reporter
+"""
+
+
+def run_reporter(config: "Config"):
+    reporter = Reporter(config)
+    reporter.main()
 
 
 """
@@ -8,11 +20,20 @@ baseline model
 """
 
 
-def run_model_baseline(config: "Config"):
-    config.scenario_name = "baseline"
+def run_model_baseline():
+    config = Config(
+        project_path=os.path.dirname(__file__),
+        model_name="westeros",
+        scenario_name="baseline_2",
+        year_start=690,
+        year_end=720,
+        year_step=10,
+        year_base=700
+    )
     scenario = Scenario(config=config)
     scenario = setup_baseline(scenario)
     scenario.solve()
+    run_reporter(config=config)
 
 
 def setup_baseline(scenario: "Scenario"):
@@ -41,13 +62,22 @@ emission_bound_cumulative model
 """
 
 
-def run_model_emission_bound_cumulative(config: "Config"):
-    config.scenario_name = "emission_bound_cumulative"
+def run_model_emission_bound_cumulative():
+    config = Config(
+        project_path=os.path.dirname(__file__),
+        model_name="westeros",
+        scenario_name="emission_bound_cumulative",
+        year_start=690,
+        year_end=720,
+        year_step=10,
+        year_base=700
+    )
     scenario = Scenario(config=config)
     scenario = setup_baseline(scenario)
     scenario = add_emission(scenario)
     scenario = add_emission_bound_cumulative(scenario)
     scenario.solve()
+    run_reporter(config=config)
 
 
 def add_emission(scenario: "Scenario"):
@@ -58,31 +88,75 @@ def add_emission(scenario: "Scenario"):
 
 
 def add_emission_bound_cumulative(scenario: "Scenario"):
-    scenario.add_category(set_name="year", file_name="Category_Year")
+    scenario.add_category(set_name="year", file_name="Category_Year_EmissionBoundCumulative")
     scenario.add_par(par_name="bound_emission", file_name="Parameter_BoundEmission_Cumulative")
     return scenario
 
 
 """
-run reporter
+emission_bound_year model
 """
 
 
-def run_reporter(config: "Config", scenario_name: str):
-    config.scenario_name = scenario_name
-    reporter = Reporter(config)
-    reporter.main()
-
-
-if __name__ == "__main__":
-    cfg = Config(
+def run_model_emission_bound_year():
+    config = Config(
+        project_path=os.path.dirname(__file__),
         model_name="westeros",
-        scenario_name="",
+        scenario_name="emission_bound_year",
         year_start=690,
         year_end=720,
         year_step=10,
         year_base=700
     )
-    # run_model_baseline(config=cfg)
-    run_model_emission_bound_cumulative(config=cfg)
-    # run_reporter(config=cfg, scenario_name="emission_bound_cumulative")
+    scenario = Scenario(config=config)
+    scenario = setup_baseline(scenario)
+    scenario = add_emission(scenario)
+    scenario = add_emission_bound_year(scenario)
+    scenario.solve()
+    run_reporter(config=config)
+
+
+def add_emission_bound_year(scenario: "Scenario"):
+    scenario.add_category(set_name="year", file_name="Category_Year_EmissionBoundYear")
+    # scenario.add_set(set_name="type_year", file_name="Set_TypeYear")
+    scenario.add_ts_par(par_name="bound_emission", file_name="Parameter_BoundEmission_Year", year_col="type_year", horizon="future")
+    return scenario
+
+
+"""
+emission_bound_cumulative_tax model
+"""
+
+
+def run_model_emission_bound_cumulative_tax():
+    config = Config(
+        project_path=os.path.dirname(__file__),
+        model_name="westeros",
+        scenario_name="emission_bound_cumulative_tax",
+        year_start=690,
+        year_end=720,
+        year_step=10,
+        year_base=700
+    )
+    scenario = Scenario(config=config)
+    scenario = setup_baseline(scenario)
+    scenario = add_emission(scenario)
+    scenario = add_emission_cumulative_bound_tax(scenario)
+    scenario.solve()
+    run_reporter(config=config)
+
+
+def add_emission_cumulative_bound_tax(scenario: "Scenario"):
+    scenario.add_set(set_name="type_year", file_name="Set_TypeYear")
+    scenario.add_category(set_name="year", file_name="Category_Year_EmissionBoundCumulative")
+    scenario.add_par(par_name="bound_emission", file_name="Parameter_BoundEmission_Cumulative")
+    scenario.add_ts_par(par_name="tax_emission", file_name="Parameter_BoundEmission_Tax", year_col="type_year", horizon="future")
+    return scenario
+
+
+if __name__ == "__main__":
+
+    # run_model_baseline()
+    run_model_emission_bound_cumulative()
+    # run_model_emission_bound_year()
+    # run_model_emission_bound_cumulative_tax()
