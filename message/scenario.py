@@ -29,6 +29,8 @@ class Scenario:
         self.future = [year for year in self.horizon if year >= self.config.year_base]
         self.scenario.add_horizon(year=self.horizon, firstmodelyear=self.config.year_base)
         self.year_df = self.scenario.vintage_and_active_years()
+        self.year_act = self.year_df["year_act"].to_list()
+        self.year_vtg = self.year_df["year_vtg"].to_list()
 
     def load_xlsx(self, file_name: str):
         return pd.read_excel(os.path.join(self.config.dir_input, f'{file_name}.xlsx'))
@@ -36,6 +38,10 @@ class Scenario:
     def add_set(self, set_name: str, file_name: str):
         df = self.load_xlsx(file_name)
         self.scenario.add_set(set_name, list(df["name"]))
+
+    def add_map(self, map_name: str, file_name: str):
+        df = self.load_xlsx(file_name)
+        self.scenario.add_set(map_name, df)
 
     def add_category(self, set_name: str, file_name: str):
         df = self.load_xlsx(file_name)
@@ -65,6 +71,14 @@ class Scenario:
         year_col: Optional[YearType] = None,
         horizon: Optional[HorizonType] = None
     ):
+        """
+        by
+        (1) adding "year_col" and "horizon" params, and
+        (2) designing wide-format input tables,
+        it is more flexible to
+        (1) run the model with different "year_start", "year_end", "year_step", "year_base"
+        (2) maintain the wide-format input tables
+        """
         df = self.load_xlsx(file_name=file_name)
         self.add_unit_from_df(df=df)
         for _, row in df.iterrows():
@@ -99,8 +113,8 @@ class Scenario:
         for col in index_cols:
             par_dict[col] = par_row[col]
         if year_col is None and horizon is None:
-            par_dict["year_vtg"] = self.year_df["year_vtg"].to_list()
-            par_dict["year_act"] = self.year_df["year_act"].to_list()
+            par_dict["year_vtg"] = self.year_vtg
+            par_dict["year_act"] = self.year_act
             par_dict["value"] = par_row["value"]
         else:
             par_dict[year_col] = self.__dict__[horizon]
