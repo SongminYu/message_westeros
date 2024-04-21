@@ -26,48 +26,30 @@ class Reporter:
         self.mp.close_db()
 
     def test(self):
-        print(self.scenario.var("PRICE_EMISSION", {"node": "Westeros"}))
+        ...
 
     def test_save_data(self):
-        DATA_NAMES = [
+        data_names = [
+            'OBJ',
             "ACT",
             "CAP",
-
-            "out",
-            "output",
-            "out_hist",
-            "ref_activity",
-
-            "in",
-            "input",
-            "in_hist",
-
-            "emi",
-            "emission_factor",
-            "emi_hist",
-
-            "inv",
-            "inv_cost",
-            "CAP_NEW",
-            "inv_hist",
-            "ref_new_capacity",
-
-            "fom",
-            "fix_cost",
-            "fom_hist",
-            "ref_capacity",
-
-            "vom",
-            "var_cost",
-            "vom_hist",
-            "ref_activity",
-
-            "tom",
-
-            "C", 'COST_NODAL', 'COST_NODAL_NET', 'DEMAND', 'EMISS', 'EXT', 'GDP', 'I', 'LAND', 'OBJ', 'PRICE_COMMODITY',
-            'PRICE_EMISSION', 'REL', 'STOCK', 'STORAGE', 'STORAGE_CHARGE'
+            'C',
+            'COST_NODAL',
+            'COST_NODAL_NET',
+            'DEMAND',
+            'EMISS',
+            'EXT',
+            'GDP',
+            'I',
+            'LAND',
+            'PRICE_COMMODITY',
+            'PRICE_EMISSION',
+            'REL',
+            'STOCK',
+            'STORAGE',
+            'STORAGE_CHARGE'
         ]
-        for data_name in DATA_NAMES:
+        for data_name in data_names:
             try:
                 self.save_data(data_name=data_name)
             except:
